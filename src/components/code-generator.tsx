@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useState, useRef, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { generateCode, type State } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -103,7 +103,7 @@ function CodeDisplay({
 }
 
 export function CodeGenerator() {
-  const [state, formAction] = useFormState(generateCode, initialState);
+  const [state, formAction] = useActionState(generateCode, initialState);
   const { toast } = useToast();
   const [showLogic, setShowLogic] = useState(false);
   const [language, setLanguage] = useState<string | undefined>();
