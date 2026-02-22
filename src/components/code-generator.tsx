@@ -33,6 +33,7 @@ import {
   ClipboardPaste,
   BrainCircuit,
   Sparkles,
+  Download,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -64,8 +65,10 @@ function SubmitButton() {
 
 function CodeDisplay({
   code,
+  language,
 }: {
   code: string;
+  language: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -73,6 +76,26 @@ function CodeDisplay({
     navigator.clipboard.writeText(code);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownload = () => {
+    const fileExtensionMap: { [key: string]: string } = {
+      Python: "py",
+      C: "c",
+      "C++": "cpp",
+      Java: "java",
+    };
+    const extension = fileExtensionMap[language] || "txt";
+    const filename = `logic2code-gen.${extension}`;
+    const blob = new Blob([code], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -83,14 +106,20 @@ function CodeDisplay({
             <Terminal className="text-primary" />
             <CardTitle className="text-base font-medium">Generated Code</CardTitle>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleCopy}>
-            {copied ? (
-              <Check className="h-4 w-4 text-green-500" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            <span className="sr-only">Copy code</span>
-          </Button>
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="icon" onClick={handleCopy}>
+              {copied ? (
+                <Check className="h-4 w-4 text-green-500" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+              <span className="sr-only">Copy code</span>
+            </Button>
+            <Button variant="ghost" size="icon" onClick={handleDownload}>
+              <Download className="h-4 w-4" />
+              <span className="sr-only">Download code</span>
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="bg-background p-4 rounded-md">
@@ -262,6 +291,7 @@ export function CodeGenerator() {
               {!pending && state.result && (
                 <CodeDisplay
                   code={state.result.code}
+                  language={language}
                 />
               )}
 
