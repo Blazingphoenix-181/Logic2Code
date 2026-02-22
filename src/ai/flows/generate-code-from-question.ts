@@ -22,10 +22,7 @@ export type GenerateCodeFromQuestionInput = z.infer<
 >;
 
 const GenerateCodeFromQuestionOutputSchema = z.object({
-  code: z.string().describe('The generated code snippet.'),
-  explanation: z
-    .string()
-    .describe('An explanation of the generated code and its logic.'),
+  code: z.string().describe('The generated code snippet, without any comments.'),
 });
 export type GenerateCodeFromQuestionOutput = z.infer<
   typeof GenerateCodeFromQuestionOutputSchema
@@ -41,14 +38,13 @@ const generateCodePrompt = ai.definePrompt({
   name: 'generateCodePrompt',
   input: { schema: GenerateCodeFromQuestionInputSchema },
   output: { schema: GenerateCodeFromQuestionOutputSchema },
-  prompt: `You are an expert programming assistant that generates code snippets and provides explanations.
+  prompt: `You are an expert programming assistant that generates code snippets.
 
-Generate a code snippet in the '{{{language}}}' programming language that solves the following problem:
+Generate a code snippet in the '{{{language}}}' programming language that solves the following problem. The code should be clean, efficient, and should not contain any comments.
 
 Problem: {{{question}}}
 
-Provide the code within a Markdown code block, and then provide a clear and concise explanation of the code, including its logic and how it addresses the problem. Your response must be a JSON object with 'code' and 'explanation' fields.
-`,
+Your response must be a JSON object with a single 'code' field containing the generated code snippet. Do not include markdown formatting for the code block.`,
 });
 
 const generateCodeFromQuestionFlow = ai.defineFlow(

@@ -25,7 +25,6 @@ import { Switch } from "@/components/ui/switch";
 import {
   Loader2,
   Terminal,
-  Lightbulb,
   Copy,
   Check,
   Play,
@@ -35,6 +34,7 @@ import {
   BrainCircuit,
   Sparkles,
 } from "lucide-react";
+import { ThemeToggle } from "./theme-toggle";
 
 const initialState: State = {};
 
@@ -64,10 +64,8 @@ function SubmitButton() {
 
 function CodeDisplay({
   code,
-  explanation,
 }: {
   code: string;
-  explanation: string;
 }) {
   const [copied, setCopied] = useState(false);
 
@@ -79,17 +77,6 @@ function CodeDisplay({
 
   return (
     <div className="space-y-6 w-full">
-      <Card className="bg-card/50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base font-medium">
-            <Lightbulb className="text-primary" />
-            Explanation
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-muted-foreground text-sm">{explanation}</div>
-        </CardContent>
-      </Card>
       <Card className="bg-card/50">
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
@@ -170,6 +157,7 @@ export function CodeGenerator() {
           </div>
         </div>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           <div className="flex items-center gap-2">
             <Label
               htmlFor="custom-logic"
@@ -274,7 +262,6 @@ export function CodeGenerator() {
               {!pending && state.result && (
                 <CodeDisplay
                   code={state.result.code}
-                  explanation={state.result.explanation}
                 />
               )}
 
