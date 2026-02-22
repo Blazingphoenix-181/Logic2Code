@@ -28,7 +28,7 @@ import {
   Copy,
   Check,
   Play,
-  Code,
+  CodeXml,
   ClipboardPaste,
   BrainCircuit,
   Sparkles,
@@ -99,13 +99,8 @@ function CodeDisplay({
 
   return (
     <div className="space-y-6 w-full">
-      <Card className="bg-card/50">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Terminal className="text-primary" />
-            <CardTitle className="text-base font-medium">Generated Code</CardTitle>
-          </div>
-          <div className="flex items-center gap-1">
+      <div className="bg-background p-4 rounded-md relative group">
+        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
             <Button variant="ghost" size="icon" onClick={handleCopy}>
               {copied ? (
                 <Check className="h-4 w-4 text-green-500" />
@@ -118,18 +113,13 @@ function CodeDisplay({
               <Download className="h-4 w-4" />
               <span className="sr-only">Download code</span>
             </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-background p-4 rounded-md">
-            <pre>
-              <code className="font-code text-sm text-foreground">
-                {code}
-              </code>
-            </pre>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+        <pre>
+          <code className="font-code text-sm text-foreground">
+            {code}
+          </code>
+        </pre>
+      </div>
     </div>
   );
 }
@@ -137,7 +127,7 @@ function CodeDisplay({
 export function CodeGenerator() {
   const [state, formAction] = useActionState(generateCode, initialState);
   const { toast } = useToast();
-  const [showLogic, setShowLogic] = useState(false);
+  const [showLogic, setShowLogic] = useState(true);
   const [language, setLanguage] = useState<string>("Python");
   const formRef = useRef<HTMLFormElement>(null);
   const { pending } = useFormStatus();
@@ -170,8 +160,8 @@ export function CodeGenerator() {
     <div className="relative">
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className="bg-primary/20 p-2 rounded-md border border-primary/50">
-            <Code size={24} className="text-primary" />
+          <div className="bg-primary p-3 rounded-lg">
+            <CodeXml size={28} className="text-primary-foreground" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Logic2Code</h1>
@@ -219,9 +209,9 @@ export function CodeGenerator() {
 
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
           <div className="space-y-6">
-            <Card className="bg-card">
+            <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-3 font-medium">
+                <CardTitle className="flex items-center gap-3 font-semibold text-lg">
                   <ClipboardPaste className="text-primary" />
                   Problem Description
                 </CardTitle>
@@ -242,9 +232,9 @@ export function CodeGenerator() {
             </Card>
 
             {showLogic && (
-              <Card className="bg-card">
+              <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-3 font-medium">
+                  <CardTitle className="flex items-center gap-3 font-semibold text-lg">
                     <BrainCircuit className="text-primary" />
                     Logic Editor
                   </CardTitle>
@@ -256,8 +246,8 @@ export function CodeGenerator() {
                   <Textarea
                     id="logic"
                     name="logic"
-                    placeholder="1. Create a 2D array dp[n][n]... 2. Loop through the string... 3. Return the maximum..."
-                    rows={5}
+                    placeholder="1. Create a 2D array dp[n][n]...&#10;2. Loop through the string...&#10;3. Return the maximum..."
+                    rows={8}
                     className="bg-input border-0 focus-visible:ring-primary"
                   />
                 </CardContent>
@@ -267,16 +257,21 @@ export function CodeGenerator() {
             <SubmitButton />
           </div>
 
-          <div className="space-y-4">
-             <CardTitle className="flex items-center gap-3 font-medium">
-                <Sparkles className="text-primary"/>
-                Generated Solution
-            </CardTitle>
-            <div className="min-h-[60vh] flex items-center justify-center rounded-lg bg-card p-8">
+          <Card className="min-h-[60vh]">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-3 font-semibold text-lg">
+                    <Sparkles className="text-primary"/>
+                    Generated Solution
+                </CardTitle>
+                <CardDescription>
+                    Your AI-generated {language || 'code'} will appear here.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
               {pending && (
-                <div className="flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center justify-center text-center text-muted-foreground pt-16">
                   <Loader2 className="h-12 w-12 animate-spin text-primary" />
-                  <p className="text-muted-foreground">Generating your code...</p>
+                  <p className="mt-4">Generating your code...</p>
                 </div>
               )}
 
@@ -288,19 +283,21 @@ export function CodeGenerator() {
               )}
 
               {!pending && !state.result && (
-                <div className="text-center text-muted-foreground">
-                  <Sparkles
-                    size={48}
-                    className="mx-auto mb-4 text-primary"
-                  />
+                <div className="flex flex-col items-center justify-center text-center text-muted-foreground pt-16">
+                  <div className="w-16 h-16 flex items-center justify-center rounded-full bg-card mb-4 border-2">
+                    <Sparkles
+                        size={32}
+                        className="text-primary"
+                    />
+                  </div>
                   <p>
                     Complete the inputs and click "Generate Code" to see the
                     magic happen.
                   </p>
                 </div>
               )}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </section>
       </form>
     </div>
