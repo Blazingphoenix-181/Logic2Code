@@ -21,7 +21,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Loader2, Terminal, Lightbulb, Copy, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import {
+  Loader2,
+  Terminal,
+  Lightbulb,
+  Copy,
+  Check,
+  Play,
+  Code,
+  RefreshCw,
+  ClipboardPaste,
+  BrainCircuit,
+  Sparkles,
+} from "lucide-react";
 
 const initialState: State = {};
 
@@ -31,7 +44,8 @@ function SubmitButton() {
     <Button
       type="submit"
       disabled={pending}
-      className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+      className="w-full text-lg py-6 bg-accent hover:bg-accent/90 text-accent-foreground"
+      size="lg"
     >
       {pending ? (
         <>
@@ -39,7 +53,10 @@ function SubmitButton() {
           Generating...
         </>
       ) : (
-        "Generate Code"
+        <>
+          <Play className="mr-2" />
+          Generate Code
+        </>
       )}
     </Button>
   );
@@ -61,23 +78,23 @@ function CodeDisplay({
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 w-full">
+      <Card className="bg-card/50">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-base font-medium">
             <Lightbulb className="text-primary" />
             Explanation
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">{explanation}</p>
+          <div className="text-muted-foreground text-sm">{explanation}</div>
         </CardContent>
       </Card>
-      <Card>
+      <Card className="bg-card/50">
         <CardHeader className="flex flex-row items-center justify-between">
           <div className="flex items-center gap-2">
             <Terminal className="text-primary" />
-            <CardTitle>Generated Code</CardTitle>
+            <CardTitle className="text-base font-medium">Generated Code</CardTitle>
           </div>
           <Button variant="ghost" size="icon" onClick={handleCopy}>
             {copied ? (
@@ -89,7 +106,7 @@ function CodeDisplay({
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="bg-card-foreground/5 p-4 rounded-md">
+          <div className="bg-background p-4 rounded-md">
             <pre>
               <code className="font-code text-sm text-foreground">
                 {code}
@@ -106,8 +123,9 @@ export function CodeGenerator() {
   const [state, formAction] = useActionState(generateCode, initialState);
   const { toast } = useToast();
   const [showLogic, setShowLogic] = useState(false);
-  const [language, setLanguage] = useState<string | undefined>();
+  const [language, setLanguage] = useState<string>("Python");
   const formRef = useRef<HTMLFormElement>(null);
+  const { pending } = useFormStatus();
 
   useEffect(() => {
     if (state.error) {
@@ -133,89 +151,149 @@ export function CodeGenerator() {
     }
   }, [state, toast]);
 
+  const handleReset = () => {
+    window.location.reload();
+  };
+
   return (
-    <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-      <div className="lg:sticky top-24">
-        <Card>
-          <CardHeader>
-            <CardTitle>Code Problem</CardTitle>
-            <CardDescription>
-              Describe your coding problem and let AI generate a solution for you.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form ref={formRef} action={formAction} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="question">Your Question</Label>
+    <div className="relative">
+      <header className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="bg-primary/20 p-2 rounded-md border border-primary/50">
+            <Code size={24} className="text-primary" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Logic2Code</h1>
+            <p className="text-muted-foreground">
+              Empowering developers to think first, code second.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Label
+              htmlFor="custom-logic"
+              className="text-xs text-muted-foreground font-bold"
+            >
+              CUSTOM LOGIC
+            </Label>
+            <Switch
+              id="custom-logic"
+              checked={showLogic}
+              onCheckedChange={setShowLogic}
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Label className="text-xs text-muted-foreground font-bold">
+              LANG:
+            </Label>
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="w-32 bg-card border-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Python">Python</SelectItem>
+                <SelectItem value="C">C</SelectItem>
+                <SelectItem value="C++">C++</SelectItem>
+                <SelectItem value="Java">Java</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <Button variant="ghost" size="icon" onClick={handleReset}>
+            <RefreshCw size={16} />
+          </Button>
+        </div>
+      </header>
+
+      <form ref={formRef} action={formAction}>
+        <input type="hidden" name="language" value={language} />
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+          <div className="space-y-6">
+            <Card className="bg-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3 font-medium">
+                  <ClipboardPaste className="text-primary" />
+                  Problem Description
+                </CardTitle>
+                <CardDescription>
+                  Paste the coding challenge or problem description here.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
                 <Textarea
                   id="question"
                   name="question"
-                  placeholder="e.g., How do I reverse a string in Python?"
+                  placeholder="e.g. Write a function that finds the longest palindromic substring in a given string..."
                   rows={5}
                   required
+                  className="bg-input border-0 focus-visible:ring-primary"
                 />
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="space-y-2">
-                <Label>Programming Language</Label>
-                <Select name="language" value={language} onValueChange={setLanguage} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="C">C</SelectItem>
-                    <SelectItem value="C++">C++</SelectItem>
-                    <SelectItem value="Python">Python</SelectItem>
-                    <SelectItem value="Java">Java</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowLogic(!showLogic)}
-                >
-                  {showLogic ? "Hide Optional Logic" : "Add Optional Logic"}
-                </Button>
-                {showLogic && (
+            {showLogic && (
+              <Card className="bg-card">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 font-medium">
+                    <BrainCircuit className="text-primary" />
+                    Logic Editor
+                  </CardTitle>
+                  <CardDescription>
+                    Write your algorithm or pseudocode below.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
                   <Textarea
                     id="logic"
                     name="logic"
-                    placeholder="Describe your approach or logic for solving the problem."
-                    rows={3}
+                    placeholder="1. Create a 2D array dp[n][n]... 2. Loop through the string... 3. Return the maximum..."
+                    rows={5}
+                    className="bg-input border-0 focus-visible:ring-primary"
                   />
-                )}
-              </div>
-              <SubmitButton />
-            </form>
-          </CardContent>
-        </Card>
-      </div>
+                </CardContent>
+              </Card>
+            )}
 
-      <div className="min-h-[60vh] flex items-center justify-center">
-        {useFormStatus().pending && (
-          <div className="flex flex-col items-center gap-4">
-            <Loader2 className="h-12 w-12 animate-spin text-primary" />
-            <p className="text-muted-foreground">Generating your code...</p>
+            <SubmitButton />
           </div>
-        )}
 
-        {!useFormStatus().pending && state.result && (
-          <CodeDisplay
-            code={state.result.code}
-            explanation={state.result.explanation}
-          />
-        )}
+          <div className="space-y-4">
+             <CardTitle className="flex items-center gap-3 font-medium">
+                <Sparkles className="text-primary"/>
+                Generated Solution
+            </CardTitle>
+            <div className="min-h-[60vh] flex items-center justify-center rounded-lg bg-card p-8">
+              {pending && (
+                <div className="flex flex-col items-center gap-4">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary" />
+                  <p className="text-muted-foreground">Generating your code...</p>
+                </div>
+              )}
 
-        {!useFormStatus().pending && !state.result && (
-          <div className="text-center text-muted-foreground">
-            <Terminal size={48} className="mx-auto mb-4" />
-            <p>Your generated code will appear here.</p>
+              {!pending && state.result && (
+                <CodeDisplay
+                  code={state.result.code}
+                  explanation={state.result.explanation}
+                />
+              )}
+
+              {!pending && !state.result && (
+                <div className="text-center text-muted-foreground">
+                  <Sparkles
+                    size={48}
+                    className="mx-auto mb-4 text-primary"
+                  />
+                  <p>
+                    Complete the inputs and click "Generate Code" to see the
+                    magic happen.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        )}
-      </div>
-    </section>
+        </section>
+      </form>
+    </div>
   );
 }
