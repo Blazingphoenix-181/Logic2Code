@@ -29,7 +29,6 @@ import {
   Check,
   Play,
   Code,
-  RefreshCw,
   ClipboardPaste,
   BrainCircuit,
   Sparkles,
@@ -167,10 +166,6 @@ export function CodeGenerator() {
     }
   }, [state, toast]);
 
-  const handleReset = () => {
-    window.location.reload();
-  };
-
   return (
     <div className="relative">
       <header className="flex items-center justify-between mb-8">
@@ -186,7 +181,6 @@ export function CodeGenerator() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <ThemeToggle />
           <div className="flex items-center gap-2">
             <Label
               htmlFor="custom-logic"
@@ -216,9 +210,7 @@ export function CodeGenerator() {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleReset}>
-            <RefreshCw size={16} />
-          </Button>
+          <ThemeToggle />
         </div>
       </header>
 
